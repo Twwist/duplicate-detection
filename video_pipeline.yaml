@@ -1,0 +1,11 @@
+extractor:
+  name: VideoKeyFrameFFmpegExtractor
+  args: {}
+
+encoder:
+  name: TimmEncoder
+  args:
+    name: vit_base_patch16_224
+    device: cuda
+
+pool: false
