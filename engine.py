@@ -9,7 +9,8 @@ class QdrantEngine:
         self.audio_dim = audio_dim
         self.text_dim = text_dim
 
-        self._create(self.image_dim, self.audio_dim, self.text_dim)
+        if not self.client.collection_exists(collection_name="videos"):
+            self._create(self.image_dim, self.audio_dim, self.text_dim)
 
     def _create(self, image_dim: int, audio_dim: int, text_dim: int):
         self.client.create_collection(
@@ -55,7 +56,7 @@ class QdrantEngine:
         )
 
     #0.65 for image, 0.95 for audio, 0.85 for text
-    def search(self, image_embedding, audio_embedding=None, text_embedding=None, top_k=10, image_threshold=0.5, audio_threshold=0.6, text_threshold=0.85):
+    def search(self, image_embedding, audio_embedding=None, text_embedding=None, top_k=10, image_threshold=0.65, audio_threshold=0.95, text_threshold=0.95):
         img_q = {
             "query": image_embedding,
             "using": "image",

@@ -86,6 +86,7 @@ class CLIPEncoder(torch.nn.Module):
         return outputs
 
 
+# AUDIO
 class Wav2Vec2Encoder(torch.nn.Module):
     def __init__(self, name: str = "facebook/wav2vec2-base-960h", device="cpu") -> None:
         super().__init__()
@@ -102,8 +103,6 @@ class Wav2Vec2Encoder(torch.nn.Module):
         return outputs.last_hidden_state
 
 
-
-# AUDIO
 class EnCodecEncoder(torch.nn.Module):
     def __init__(self, bandwidth=1.5, device="cpu") -> None:
         super().__init__()
