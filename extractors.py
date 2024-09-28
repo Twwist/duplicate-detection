@@ -4,6 +4,7 @@ import tempfile
 import subprocess
 import torch
 import os
+import torchaudio
 import whisperx
 import torchvision
 import torchvision.transforms.functional as F
@@ -24,7 +25,7 @@ class VideoEveryNFramesExtractor:
                 break
 
             if frame_count % self.n == 0:
-                yield Image.fromarray(frame)
+                yield {"image": Image.fromarray(frame)}
 
             frame_count += 1
 
@@ -47,7 +48,7 @@ class VideoNEvenlySpacedExtractor:
             cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
             ret, frame = cap.read()
             if ret:
-                yield Image.fromarray(frame)
+                yield {"image": Image.fromarray(frame)}
 
         cap.release()
 
@@ -74,10 +75,28 @@ class VideoKeyFrameFFmpegExtractor:
             for keyframe in keyframes:
                 frame_path = os.path.join(temp_dir, keyframe)
                 frame = cv2.imread(frame_path)
-                yield Image.fromarray(frame)
+                yield {"image": Image.fromarray(frame)}
 
 # AUDIO
-# TODO Make class for audio splitting, because large files couldn't be loaded into vram
+class AudioFull:
+    def __call__(self, audio_path):
+        wav, sr = torchaudio.load(audio_path)
+        if wav.shape[0] == 2:
+            wav = wav.mean(0, keepdim=True)
+        yield {"raw_audio": wav, "sample_rate": sr}
+
+
+class AudioNSecondsSplit:
+    def __init__(self, seconds: float):
+        self.seconds = seconds
+
+    def __call__(self, audio_path):
+        wav, sr = torchaudio.load(audio_path)
+        if wav.shape[0] == 2:
+            wav = wav.mean(0, keepdim=True)
+        num_frames = int(sr * self.seconds)
+        for i in range(0, wav.shape[1], num_frames):
+            yield {"raw_audio": wav[:, i: min(i + num_frames, wav.shape[1])], "sample_rate": sr}
 
 
 # TEXT

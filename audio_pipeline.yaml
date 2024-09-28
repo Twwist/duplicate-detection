@@ -1,0 +1,12 @@
+extractor:
+  name: AudioNSecondsSplit
+  args: 
+    seconds: 10
+
+encoder:
+  name: Wav2Vec2Encoder
+  args:
+    name: facebook/wav2vec2-base-960h
+    device: cuda
+
+pool: false

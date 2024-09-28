@@ -16,11 +16,11 @@ class Pipeline:
         embeddings = []
         fragments = self.extractor(file_path)
         for fragment in fragments:
-            fragment_embedding = self.encoder.encode(fragment).squeeze()
+            fragment_embedding = self.encoder.encode(**fragment).squeeze().detach().cpu()
             if fragment_embedding.dim() == 1:
                 embeddings.append(fragment_embedding)
             else:
-                embeddings.extend(fragment_embedding.tolist())
+                embeddings.extend(fragment_embedding)
 
         embeddings = torch.stack(embeddings)
         if self.pool:
@@ -28,8 +28,6 @@ class Pipeline:
         
         return embeddings
     
-
-class PipelineBuilder:
     @staticmethod
     def from_yaml(yaml_path):
         import yaml
@@ -40,3 +38,4 @@ class PipelineBuilder:
         encoder = get_class(config["encoder"]["name"])(**config["encoder"]["args"])
         pool = config["pool"]
         return Pipeline(extractor, encoder, pool)
+
