@@ -1,6 +1,7 @@
 extractor:
   name: TextExtractorWhisperx
   args: 
+    name: small
     device: cuda
 
 encoder:

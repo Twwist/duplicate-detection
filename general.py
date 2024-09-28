@@ -24,9 +24,9 @@ class Pipeline:
 
         embeddings = torch.stack(embeddings)
         if self.pool:
-            embeddings = torch.mean(embeddings, dim=0)
+            embeddings = torch.mean(embeddings, dim=0, keepdim=True)
         
-        return embeddings
+        return embeddings.numpy()
     
     @staticmethod
     def from_yaml(yaml_path):

@@ -87,7 +87,7 @@ class AudioFull:
 
 
 class AudioNSecondsSplit:
-    def __init__(self, seconds: float):
+    def __init__(self, seconds: float = 5):
         self.seconds = seconds
 
     def __call__(self, audio_path):
@@ -95,8 +95,8 @@ class AudioNSecondsSplit:
         if wav.shape[0] == 2:
             wav = wav.mean(0, keepdim=True)
         num_frames = int(sr * self.seconds)
-        for i in range(0, wav.shape[1], num_frames):
-            yield {"raw_audio": wav[:, i: min(i + num_frames, wav.shape[1])], "sample_rate": sr}
+        for i in range(num_frames, wav.shape[1], num_frames):
+            yield {"raw_audio": wav[:, i - num_frames: min(i, wav.shape[1])], "sample_rate": sr}
 
 
 # TEXT

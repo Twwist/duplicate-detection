@@ -1,7 +1,7 @@
 extractor:
   name: AudioNSecondsSplit
   args: 
-    seconds: 10
+    seconds: 5
 
 encoder:
   name: Wav2Vec2Encoder
