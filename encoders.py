@@ -137,12 +137,13 @@ class EnCodecEncoder(torch.nn.Module):
 
 # TEXT
 class TextEncoderE5:
-    def __init__(self):
-        self.model = AutoModel.from_pretrained('intfloat/multilingual-e5-base')
+    def __init__(self, device="cpu"):
+        self.device = torch.device(device)
+        self.model = AutoModel.from_pretrained('intfloat/multilingual-e5-base').to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained('intfloat/multilingual-e5-base')
 
-    def encode(self, text: list, max_length=512, padding=True, truncation=True, return_tensors='pt', normalize_p=2, normalize_dim=1):
-        batch_dict = self.tokenizer(text, max_length=max_length, padding=padding, truncation=truncation, return_tensors=return_tensors)
+    def encode(self, text: str, max_length=512, padding=True, truncation=True, return_tensors='pt', normalize_p=2, normalize_dim=1):
+        batch_dict = self.tokenizer(text, max_length=max_length, padding=padding, truncation=truncation, return_tensors=return_tensors).to(self.device)
         outputs = self.model(**batch_dict)
         embeddings = self.average_pool(outputs.last_hidden_state, batch_dict['attention_mask'])
         embeddings = F.normalize(embeddings, p=normalize_p, dim=normalize_dim)

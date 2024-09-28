@@ -1,0 +1,11 @@
+extractor:
+  name: TextExtractorWhisperx
+  args: 
+    device: cuda
+
+encoder:
+  name: TextEncoderE5
+  args:
+    device: cuda
+
+pool: false

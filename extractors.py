@@ -101,12 +101,12 @@ class AudioNSecondsSplit:
 
 # TEXT
 class TextExtractorWhisperx:
-    def __init__(self, device='cpu', compute_type='int8'):
-        self.model = whisperx.load_model("large-v2", device, compute_type=compute_type)
+    def __init__(self, name="large-v2", device='cpu', compute_type='int8'):
+        self.model = whisperx.load_model(name, device=device, compute_type=compute_type)
 
     def __call__(self, path, batch_size=64):
         audio = whisperx.load_audio(path)
         result = self.model.transcribe(audio, batch_size=batch_size)
-        transcibe_text = ' '.join([i['text'] for i in result["segments"]])
+        transcribe_text = ' '.join([i['text'] for i in result["segments"]])
 
-        return transcibe_text
+        yield {"text": transcribe_text}
