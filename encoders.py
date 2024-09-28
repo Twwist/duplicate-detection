@@ -3,8 +3,11 @@ import numpy as np
 
 import torch
 import transformers
+from torch import Tensor
+import torch.nn.functional as F
 from transformers import CLIPProcessor, CLIPModel
 from transformers import EncodecModel, AutoProcessor
+from transformers import AutoTokenizer, AutoModel, AutoModelForSeq2SeqLM
 
 from PIL import Image
 
@@ -13,6 +16,7 @@ from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
 
 
+# IMAGE
 class ColorHistogramEncoder:
     def __init__(self, n_buckets=256):
         self.n_buckets = n_buckets
@@ -95,6 +99,8 @@ class Wav2Vec2Encoder(torch.nn.Module):
         return outputs.last_hidden_state
 
 
+
+# AUDIO
 class EnCodecEncoder(torch.nn.Module):
     def __init__(self, bandwidth=1.5, device="cpu") -> None:
         super().__init__()
@@ -122,3 +128,22 @@ class EnCodecEncoder(torch.nn.Module):
 
         embeddings = torch.stack(embeddings)
         return embeddings
+
+
+# TEXT
+class TextEncoderE5:
+    def __init__(self):
+        self.model = AutoModel.from_pretrained('intfloat/multilingual-e5-base')
+        self.tokenizer = AutoTokenizer.from_pretrained('intfloat/multilingual-e5-base')
+
+    def encode(self, text: list, max_length=512, padding=True, truncation=True, return_tensors='pt', normalize_p=2, normalize_dim=1):
+        batch_dict = self.tokenizer(text, max_length=max_length, padding=padding, truncation=truncation, return_tensors=return_tensors)
+        outputs = self.model(**batch_dict)
+        embeddings = self.average_pool(outputs.last_hidden_state, batch_dict['attention_mask'])
+        embeddings = F.normalize(embeddings, p=normalize_p, dim=normalize_dim)
+
+        return embeddings
+
+    def average_pool(self, last_hidden_states: Tensor, attention_mask: Tensor) -> Tensor:
+        last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
+        return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]

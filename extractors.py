@@ -4,10 +4,13 @@ import tempfile
 import subprocess
 import torch
 import os
+import whisperx
 import torchvision
 import torchvision.transforms.functional as F
 from PIL import Image
 
+
+# IMAGE
 class VideoEveryNFramesExtractor:
     def __init__(self, n: int):
         self.n = n
@@ -73,5 +76,18 @@ class VideoKeyFrameFFmpegExtractor:
                 frame = cv2.imread(frame_path)
                 yield Image.fromarray(frame)
 
-
+# AUDIO
 # TODO Make class for audio splitting, because large files couldn't be loaded into vram
+
+
+# TEXT
+class TextExtractorWhisperx:
+    def __init__(self, device='cpu', compute_type='int8'):
+        self.model = whisperx.load_model("large-v2", device, compute_type=compute_type)
+
+    def __call__(self, path, batch_size=64):
+        audio = whisperx.load_audio(path)
+        result = self.model.transcribe(audio, batch_size=batch_size)
+        transcibe_text = ' '.join([i['text'] for i in result["segments"]])
+
+        return transcibe_text
