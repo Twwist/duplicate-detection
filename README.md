@@ -4,9 +4,9 @@
 ## Команда to2to models
 Состав:
 
-- Муратшин Динияр [@tww1st](https://t.me/tww1st)
+- Муратшин Динияр [@iztwwist](https://t.me/iztwwist)
 - Гарифуллин Тимур [@Murkat07](https://t.me/Murkat07)
-- Мурзаев Михаил [@@mishkashishka333](https://t.me/mishkashishka333)
+- Мурзаев Михаил [@mishkashishka333](https://t.me/mishkashishka333)
 
 ## Описание решения
 Дубликаты видео проверяются на соответствие аудио, тексту и кадрам с другими видео из векторной базы данных.  
